@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 r'''
-	Copyright 2025 Photubias(c)
+	Copyright 2026 Photubias(c)
 
         This program is free software: you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
@@ -795,6 +795,10 @@ def scanNetwork(sAdapter, sMacaddr, sWinguid):
     #print('Using adapter ' + sAdapter + '\n')
     bNpfdevice = sAdapter.encode()
 
+	## Start listener in separate thread
+    oPool = ThreadPool(processes=1)
+    oPoolResult = oPool.apply_async(receiveRawPackets, (bNpfdevice, iDiscoverTimeout, sMacaddr, '8892', False))
+
     ## Start building discovery packet
     print('Building packet')
 
@@ -804,11 +808,13 @@ def scanNetwork(sAdapter, sMacaddr, sWinguid):
 
     ## Receiving packets as bytearr (88cc == LDP, 8892 == device PN_DCP)
     print('\nReceiving packets over ' + str(iDiscoverTimeout) + ' seconds ...\n')
-    receivedDataArr = receiveRawPackets(bNpfdevice, iDiscoverTimeout, sMacaddr, '8892')
+    time.sleep(iDiscoverTimeout)
+    arrReceivedData = oPoolResult.get()
+	
     print()
-    print('\nSaved ' + str(len(receivedDataArr)) + ' packets')
+    print('\nSaved {} packets'.format(len(arrReceivedData)))
     print()
-    return receivedDataArr, bNpfdevice
+    return arrReceivedData, bNpfdevice
 
 def parseData(receivedDataArr):
     #print('These are the devices detected ({}):'.format(len(receivedDataArr)))
@@ -906,7 +912,7 @@ while True:
         sys.exit()
     elif sAnswer2 == 'r':
         receivedDataArr, bNpfdevice = scanNetwork(sAdapter, sMacaddr, sWinguid)
-        parseData(receivedDataArr)
+        lstDevices = parseData(receivedDataArr)
         continue
     elif sAnswer2 == 'a':
         device = addDevice()
