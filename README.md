@@ -11,3 +11,5 @@ Industrial Security Scripts
 * Mitsubishi: Simple Broadcast scanner for Mitsubishi PLCs, together with a broadcast State Changer for Mitsubishi
 * Beckhoff ADS Pwner & Route Spoofer: More details coming later (should've attended BruCON 0x0B ;-)
 * eWONScan: Simple Broadcast scanner and enumerator for eWON devices
+* HirschmannScan: Broadcast (LLC) scanner, flash the device and edit the device
+* OmronScan: Broadcast (UDP) scanner, TCP readout, stop/RUN PLC and retrieve (upload) program from PLC
